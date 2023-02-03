@@ -1,5 +1,5 @@
 import numpy as np
-from lmfit import Parameters
+
 
 
 def gaussian17(x, z, wid, amp0, cen0, amp1, cen1, amp2, cen2, amp3, cen3, amp4, cen4,
@@ -37,14 +37,14 @@ def gaussian(x, z, wid, strength, cen):
 		a = st*strength[i]
 		vars()['amp' + str(i)] = a
 		amp[i] = vars()
-		cen = wl_vac[i]
+		#cen = wl_vac[i]
 		#vars()['cen' + str(i)] = cen
 		
 	gauss = np.zeros_like(amp)
 	for i in range(len(amp)):
 		a = amp[i]
 		c = cen[i]
-		g =  a * np.exp(-(x-cen*(1+z))**2 / (2*wid**2))
+		g =  a * np.exp(-(x-c*(1+z))**2 / (2*wid**2))
 		gauss[i] = g
 		i += 1
 			
@@ -72,7 +72,8 @@ def gaussTest3(x, z, wid, amp, cen):
 	return amp * np.exp(-(x-cen*(1+z))**2 / (2*wid**2))
 	
 	
-def gauss(x, z, wid, amp, cen, flux):
+def gauss0(x, z, wid, amp, cen, flux):
+	
 	i = 0
 	G = np.array([])
 	for a in amp:
@@ -84,3 +85,38 @@ def gauss(x, z, wid, amp, cen, flux):
 			G += g
 		i += 1
 	return G-flux
+	
+
+def gauss(pars, x, f=None, lines=None):
+	cen = lines["wl"].values
+	names = lines["line"]
+	vals = pars.valuesdict()
+	z = vals["z"]
+	wid = vals["wid"]
+	i = 0
+	G = np.array([])	
+
+	for key, value in pars.items():
+		if len(f) == 0:
+			print("No flux given, returning model")
+			return G
+			
+		if len(lines) == 0:
+			print("No lines to fit")
+			break
+		if key != "z" and key != "wid":
+			c = cen[i]
+			a = value.value			
+			g = gaussTest3(x, z, wid, a, c)
+			i += 1
+			if len(G) == 0:
+				G = np.append(G, g)
+			else:
+				G = np.maximum(g, G)
+				# G += g
+				# or G += g, not sure which would be better
+		else:
+			pass
+
+		
+	return G-f

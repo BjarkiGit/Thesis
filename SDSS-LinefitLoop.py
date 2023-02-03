@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import astropy.io.fits as f
-from lmfit import Model, Parameters, minimize, report_fit
+from lmfit import Model, Parameters, Minimizer, minimize, report_fit, fit_report
 import pandas as pd
 
 # This is where the Gaussian lives
@@ -29,9 +29,48 @@ df["flux"] = newFlux
 lines = pd.read_csv("../Lines.txt", sep = r"\s+")
 
 wl_vac = lines["wl"]
-strength = lines["strength"]
-st = 100
+lineName = lines["line"]
+st = 200 # Initial guess for strength of Halpha
+strength = st * lines["strength"]
+line = dict(zip(lineName, wl_vac))
 
+# print(lines.head())	
+
+pars = Parameters()
+
+pars.add_many(("amp0", strength[0], True, 0, 500),
+			  ("amp1", strength[1], True, 0, 500),
+			  ("amp2", strength[2], True, 0, 500),
+			  ("amp3", strength[3], True, 0, 500),
+			  ("amp4", strength[4], True, 0, 500),
+			  ("amp5", strength[5], True, 0, 500),
+			  ("amp6", strength[6], True, 0, 500),
+			  ("amp7", strength[7], True, 0, 500),
+			  ("amp8", strength[8], True, 0, 500),
+			  ("amp9", strength[9], True, 0, 500),
+			  ("amp10", strength[10], True, 0, 500),
+			  ("amp11", strength[11], True, 0, 500),
+			  ("amp12", strength[12], True, 0, 500),
+			  ("amp13", strength[13], True, 0, 500),
+			  ("amp14", strength[14], True, 0, 500),
+			  ("amp15", strength[15], True, 0, 500),
+			  ("amp16", strength[16], True, 0, 500),
+			  ("amp17", strength[17], True, 0, 500))		
+pars.add("z", 0.25, True, 0, 1)
+pars.add("wid", 2, True, 0, 10)
+
+# fitter = Minimizer(gauss, pars, fcn_args=(df["wl"].values,),fcn_kws={"f":df["flux"].values, "lines":lines})
+# result0 = fitter.minimize(method="leastsq")
+# print(result0.params.pretty_print())
+
+result = minimize(gauss, pars, args=(df["wl"].values,), kws={"f":df["flux"].values, "lines":lines})
+# print(result1.params.pretty_print())
+print(f"Max: {np.max(result.residual)}, mean: {np.mean(result.residual)}, median: {np.median(result.residual)}")
+# plt.plot(df["wl"], df["flux"])
+# plt.plot(df["wl"], df["flux"]+result.residual)
+# plt.show()
+
+""" 
 G = gauss(df["wl"], z = 0.25, wid = 2, amp = strength*st, cen = wl_vac, flux = df["flux"])
 pars = Parameters()
 pars.add("z", 0.25)
@@ -40,7 +79,7 @@ pars.add("cen", wl_vac)
 pars.add("wid", 2)
 pars["cen"].vary = False
 result = minimize(gauss, pars, args=df["wl"], kws=df["flux"])
-
+ """
 """
 st = 100
 pars = Parameters()
@@ -160,3 +199,6 @@ plt.ylabel("Flux")
 plt.savefig(path+"/Figs/fit.pdf")
 plt.show()
 """
+
+""" print(f'parameter names: {mod.param_names}')
+print(f'independent variables: {mod.independent_vars}') """
