@@ -30,7 +30,7 @@ lines = pd.read_csv("../Lines.txt", sep = r"\s+")
 
 wl_vac = lines["wl"]
 lineName = lines["line"]
-st = 200 # Initial guess for strength of Halpha
+st = 100 # Initial guess for strength of Halpha
 strength = st * lines["strength"]
 line = dict(zip(lineName, wl_vac))
 
@@ -64,11 +64,11 @@ pars.add("wid", 2, True, 0, 10)
 # print(result0.params.pretty_print())
 
 result = minimize(gauss, pars, args=(df["wl"].values,), kws={"f":df["flux"].values, "lines":lines})
-# print(result1.params.pretty_print())
+print(result.params.pretty_print())
 print(f"Max: {np.max(result.residual)}, mean: {np.mean(result.residual)}, median: {np.median(result.residual)}")
-# plt.plot(df["wl"], df["flux"])
-# plt.plot(df["wl"], df["flux"]+result.residual)
-# plt.show()
+plt.plot(df["wl"], df["flux"])
+plt.plot(df["wl"], df["flux"]+result.residual)
+plt.show()
 
 """ 
 G = gauss(df["wl"], z = 0.25, wid = 2, amp = strength*st, cen = wl_vac, flux = df["flux"])
