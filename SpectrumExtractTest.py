@@ -9,17 +9,17 @@ from models import *
 path = "../J0156/"
 
 cube = Cube(filename = path+"ADP.2021-10-13T20:49:23.745.fits")
-spe = cube[:,160,160]
+spe = cube[:,159,152]
 range = spe.get_range()
 step = spe.get_step()
 
 wl = np.arange(range[0], range[1]+step, step)
 flux = spe.data
 
-
+print(np.where(wl==8300))
 df = pd.DataFrame({"flux0":flux, "wl":wl})
 # Total number of wavelengths is 3829
-wdw = 100
+wdw = 500
 newFlux = df["flux0"]-df["flux0"].rolling(window=wdw, center=True).median()
 df["flux"] = newFlux
 nan_count = df["flux"].isna().sum()
@@ -33,7 +33,20 @@ lines = pd.read_csv("../Lines.txt", sep = r"\s+")
 
 wl_vac = lines["wl"]
 lineName = lines["line"]
-st = 2 # Initial guess for strength of Halpha
+st = 5 # Initial guess for strength of Halpha
+zguess = 0.27
+wguess = 2
+windows = np.array([])
+for line in lines["wl"]:
+	Center = line*(1+zguess)
+	Width = 20*wguess
+	window = np.arange(Center-Width, Center+Width+step, step)
+	plt.fill_between(window, 0, 100, alpha=0.4)
+	np.append(windows, window)
+# plt.text(lines["wl"][0]*(1+zguess), lines["strength"][0]*st, lines["line"][0])
+plt.vlines(lines["wl"][0]*(1+zguess), 0, 100, color = "r")
+df = df.mask(df["wl"] == np.any(windows))
+df = df.loc[df['wl'].isnull(),df["flux"]] = 0
 strength = st * lines["strength"]
 line = dict(zip(lineName, wl_vac))
 
@@ -59,8 +72,8 @@ pars.add_many(("amp0", strength[0], True, 0, 500),
 			  ("amp15", strength[15], True, 0, 500),
 			  ("amp16", strength[16], True, 0, 500),
 			  ("amp17", strength[17], True, 0, 500))		
-pars.add("z", 0.25, True, 0, 1)
-pars.add("wid", 2, True, 0, 10)
+pars.add("z", zguess, True, 0, 1)
+pars.add("wid", wguess, True, 0, 10)
 
 # fitter = Minimizer(gauss, pars, fcn_args=(df["wl"].values,),fcn_kws={"f":df["flux"].values, "lines":lines})
 # result0 = fitter.minimize(method="leastsq")
@@ -68,10 +81,13 @@ pars.add("wid", 2, True, 0, 10)
 
 result = minimize(gauss, pars, args=(df["wl"].values,), kws={"f":df["flux"].values, "lines":lines}, nan_policy="omit")
 
+
 df["fit"] = df["flux"].dropna()+result.residual
 print(df.head().interpolate(method="linear"))
 print(result.params.pretty_print())
 print(f"Max: {np.max(np.abs(result.residual))}, mean: {np.mean(result.residual)}, median: {np.median(result.residual)}")
-plt.plot(df["wl"], df["flux"])
-plt.plot(df["wl"], (df["flux"].dropna()+result.residual).interpolate(method="linear"))
+plt.plot(df["wl"], df["flux"], linewidth=0.5)
+plt.plot(df["wl"], gauss(result.params, df["wl"], lines= lines))
 plt.show()
+
+#

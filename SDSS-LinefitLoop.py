@@ -30,11 +30,17 @@ lines = pd.read_csv("../Lines.txt", sep = r"\s+")
 
 wl_vac = lines["wl"]
 lineName = lines["line"]
-st = 100 # Initial guess for strength of Halpha
+zguess = 0.25
+wguess = 2
+st = 200 # Initial guess for strength of Halpha
 strength = st * lines["strength"]
 line = dict(zip(lineName, wl_vac))
 
+windowCenters = wl_vac*(1+zguess)
+windowWidth = 4*wguess
+
 # print(lines.head())	
+
 
 pars = Parameters()
 
@@ -56,8 +62,8 @@ pars.add_many(("amp0", strength[0], True, 0, 500),
 			  ("amp15", strength[15], True, 0, 500),
 			  ("amp16", strength[16], True, 0, 500),
 			  ("amp17", strength[17], True, 0, 500))		
-pars.add("z", 0.25, True, 0, 1)
-pars.add("wid", 2, True, 0, 10)
+pars.add("z", zguess, True, 0, 1)
+pars.add("wid", wguess, True, 0, 10)
 
 # fitter = Minimizer(gauss, pars, fcn_args=(df["wl"].values,),fcn_kws={"f":df["flux"].values, "lines":lines})
 # result0 = fitter.minimize(method="leastsq")

@@ -95,15 +95,12 @@ def gauss(pars, x, f=None, lines=None):
 	wid = vals["wid"]
 	i = 0
 	G = np.array([])	
+	if len(cen) == 0:
+		print("No lines to model")
+		return 0
 
 	for key, value in pars.items():
-		if len(f) == 0:
-			print("No flux given, returning model")
-			return G
-			
-		if len(lines) == 0:
-			print("No lines to fit")
-			break
+		
 		if key != "z" and key != "wid":
 			c = cen[i]
 			a = value.value			
@@ -112,11 +109,15 @@ def gauss(pars, x, f=None, lines=None):
 			if len(G) == 0:
 				G = np.append(G, g)
 			else:
-				G = np.maximum(g, G)
-				# G += g
+				# G = np.maximum(g, G)
+				G += g
 				# or G += g, not sure which would be better
+
 		else:
 			pass
-
 		
-	return G-f
+	if f is None:
+		print("No flux given, returning model")
+		return G
+			
+	return f-G
