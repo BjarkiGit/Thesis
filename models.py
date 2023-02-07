@@ -27,69 +27,13 @@ def gaussian17(x, z, wid, amp0, cen0, amp1, cen1, amp2, cen2, amp3, cen3, amp4, 
            amp17 * np.exp(-(x-cen17*(1+z))**2 / (2*wid**2)) 
            
            
-           
-def gaussian(x, z, wid, strength, cen):
-	i = 0
-	st = 100 #Strengths are given as a fraction of Halpha strength,
-		 #so this is initial guess for Halpha
-	amp = np.zeros_like(strength)
-	for i in range(len(strength)):
-		a = st*strength[i]
-		vars()['amp' + str(i)] = a
-		amp[i] = vars()
-		#cen = wl_vac[i]
-		#vars()['cen' + str(i)] = cen
-		
-	gauss = np.zeros_like(amp)
-	for i in range(len(amp)):
-		a = amp[i]
-		c = cen[i]
-		g =  a * np.exp(-(x-c*(1+z))**2 / (2*wid**2))
-		gauss[i] = g
-		i += 1
-			
-	return gauss
-	
-def gaussTest(x, z, wid, amp, cen):
-	i = 0
-	for i in range(len(amp)):
-		return amp[i] * np.exp(-(x-cen[i]*(1+z))**2 / (2*wid**2))
-		i += 1
-		
-		
-def gaussTest2(pars, x, data=None):
-	vals = pars.values(dict)
-	z = vals["z"]
-	wid = vals["wid"]
-	amp = vals["amp"]
-	cen = vals["cen"]
-	model =  amp * np.exp(-(x-cen*(1+z))**2 / (2*wid**2))
-	return model - data
-	
 
-
-def gaussTest3(x, z, wid, amp, cen):
+def gaussian(x, z, wid, amp, cen):
 	return amp * np.exp(-(x-cen*(1+z))**2 / (2*wid**2))
 	
-	
-def gauss0(x, z, wid, amp, cen, flux):
-	
-	i = 0
-	G = np.array([])
-	for a in amp:
-		c = cen[i]
-		g = gaussTest3(x, z, wid, a, c)
-		if len(G) == 0:
-			G = np.append(G, g)
-		else:
-			G += g
-		i += 1
-	return G-flux
-	
 
-def gauss(pars, x, f=None, lines=None):
-	cen = lines["wl"].values
-	names = lines["line"]
+def gaussFit(pars, x, f=None, lines=None):
+	cen = lines.values
 	vals = pars.valuesdict()
 	z = vals["z"]
 	wid = vals["wid"]
@@ -102,9 +46,12 @@ def gauss(pars, x, f=None, lines=None):
 	for key, value in pars.items():
 		
 		if key != "z" and key != "wid":
+			# Might be good to get rid of this iteration
+			# would be preferable to get into a dict
+			# but it does work
 			c = cen[i]
 			a = value.value			
-			g = gaussTest3(x, z, wid, a, c)
+			g = gaussian(x, z, wid, a, c)
 			i += 1
 			if len(G) == 0:
 				G = np.append(G, g)
@@ -117,7 +64,6 @@ def gauss(pars, x, f=None, lines=None):
 			pass
 		
 	if f is None:
-		print("No flux given, returning model")
 		return G
 			
 	return f-G
