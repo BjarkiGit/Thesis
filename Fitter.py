@@ -7,7 +7,7 @@ from mpdaf.obj import Cube
 from models import *
 
 
-def fit(dataFile, linefile, xPix, yPix, medwdw, stHa, zg, wg):
+def fit(dataFile, linefile, xPix, yPix, medwdw, stHa, zg, wg, aMax):
 	cube = Cube(filename = dataFile)
 	spe = cube[:, xPix, yPix]
 
@@ -60,33 +60,30 @@ def fit(dataFile, linefile, xPix, yPix, medwdw, stHa, zg, wg):
 			else:
 				pass
 			i += 1
-	# Saving the masked flux in the dataframe	
+	# Saving the masked flux in the dataframe
 	df["maskFlux"] = fluxMask
-
 	# Creating parameters for the fit
 	pars = Parameters()
-
-	pars.add_many(("amp0", strength[0], True, 0, 500),
-				("amp1", strength[1], True, 0, 500),
-				("amp2", strength[2], True, 0, 500),
-				("amp3", strength[3], True, 0, 500),
-				("amp4", strength[4], True, 0, 500),
-				("amp5", strength[5], True, 0, 500),
-				("amp6", strength[6], True, 0, 500),
-				("amp7", strength[7], True, 0, 500),
-				("amp8", strength[8], True, 0, 500),
-				("amp9", strength[9], True, 0, 500),
-				("amp10", strength[10], True, 0, 500),
-				("amp11", strength[11], True, 0, 500),
-				("amp12", strength[12], True, 0, 500),
-				("amp13", strength[13], True, 0, 500),
-				("amp14", strength[14], True, 0, 500),
-				("amp15", strength[15], True, 0, 500),
-				("amp16", strength[16], True, 0, 500),
-				("amp17", strength[17], True, 0, 500))		
+	pars.add_many(("amp0", strength[0], True, 0, aMax),
+				("amp1", strength[1], True, 0, aMax),
+				("amp2", strength[2], True, 0, aMax),
+				("amp3", strength[3], True, 0, aMax),
+				("amp4", strength[4], True, 0, aMax),
+				("amp5", strength[5], True, 0, aMax),
+				("amp6", strength[6], True, 0, aMax),
+				("amp7", strength[7], True, 0, aMax),
+				("amp8", strength[8], True, 0, aMax),
+				("amp9", strength[9], True, 0, aMax),
+				("amp10", strength[10], True, 0, aMax),
+				("amp11", strength[11], True, 0, aMax),
+				("amp12", strength[12], True, 0, aMax),
+				("amp13", strength[13], True, 0, aMax),
+				("amp14", strength[14], True, 0, aMax),
+				("amp15", strength[15], True, 0, aMax),
+				("amp16", strength[16], True, 0, aMax),
+				("amp17", strength[17], True, 0, aMax))		
 	pars.add("z", zguess, True, 0, 1)
 	pars.add("wid", wguess, True, 0, 10)
-
 	# Minimizing residual
 	result = minimize(gaussFit, pars, args=(df["wl"].values,), kws={"f":df["maskFlux"].values, "lines":wl_vac}, nan_policy="omit")
 

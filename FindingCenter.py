@@ -1,8 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import astropy.io.fits as f
-from lmfit import Model, Parameters, Minimizer, minimize, report_fit, fit_report
-import pandas as pd
 from mpdaf.obj import Cube
 from models import *
 
