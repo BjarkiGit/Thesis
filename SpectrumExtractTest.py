@@ -42,11 +42,12 @@ for line in lines["wl"]:
 	Width = 20*wguess
 	window = np.arange(Center-Width, Center+Width+step, step)
 	plt.fill_between(window, 0, 100, alpha=0.4)
-	np.append(windows, window)
+	windows = np.append(windows, window)
+
 # plt.text(lines["wl"][0]*(1+zguess), lines["strength"][0]*st, lines["line"][0])
 plt.vlines(lines["wl"][0]*(1+zguess), 0, 100, color = "r")
-df = df.mask(df["wl"] == np.any(windows))
-df = df.loc[df['wl'].isnull(),df["flux"]] = 0
+df = df.mask(df["wl"] != np.any(windows))
+df.loc[df["wl"].isna(), df["flux"]] = 0
 strength = st * lines["strength"]
 line = dict(zip(lineName, wl_vac))
 
