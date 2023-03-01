@@ -27,9 +27,10 @@ def gaussian17(x, z, wid, amp0, cen0, amp1, cen1, amp2, cen2, amp3, cen3, amp4, 
            amp17 * np.exp(-(x-cen17*(1+z))**2 / (2*wid**2)) 
            
            
-
+### Wid is FWHM
 def gaussian(x, z, wid, amp, cen):
-	return amp * np.exp(-(x-cen*(1+z))**2 / (2*wid**2))
+	sig = wid/(2*np.sqrt(2*np.log(2)))
+	return amp * np.exp(-(x-cen*(1+z))**2 / (2*sig**2))
 	
 
 def gaussFit(pars, x, f=None, lines=None):
