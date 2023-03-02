@@ -1,9 +1,8 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from lmfit import Parameters, minimize
 import pandas as pd
 
-from models import *
+from models import gaussFit, gaussian
 """
 This function takes in the data and the lines I want to fit as files,
 the coordinates in the data and, some initial guesses as well as an
@@ -23,7 +22,7 @@ windows = Whether or not to plot the unmasked windows where we look for lines
 
 #def get_ha_wl_guess(wl, flux, zguess, winwidth=100):
 
-def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000, windows=False):
+def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
     # Using mpdaf.obj to get the spectrum at xPix and yPix
     spe = cube[:, yPix, xPix]
 
@@ -61,8 +60,8 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000, windows=False):
     #wguess = np.max([float(wg), 2])
     wguess = wg
     if wguess < 1.4:
-    	wguess = 1.4
-    
+        wguess = 1.4
+   
     # A masked flux which starts out with all zeros,
     # the fluxes close to line centers will be added to it to use
     # in fitting
@@ -77,29 +76,6 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000, windows=False):
 
         fluxMask[np.where(np.abs(df['wl'].values-Center) <= Width)] = flux.values[np.where(np.abs(df['wl'].values-Center) <= Width)] 
 
-
-        # THis is a long loop so i replaced it with the line above
-        """
-        for i, wl in enumerate(df["wl"]):
-            try:
-                if abs(wl-Center) < Width:
-                    pass
-                    #fluxMask[i] = flux[i]
-                    
-                else:
-                    pass
-            except Exception as e:
-                plt.figure()
-                plt.plot(df['wl'], df["flux0"])
-
-                plt.plot(df['wl'], df["flux"])
-                plt.plot(df['wl'], fluxMask)
-                #plt.xlim(wl_air[0]-2*wg, wl_air+2*wg)
-                plt.show()
-
-
-                raise(Exception)
-        """
 
         if line == wl_air[0]:
             st = np.max(fluxMask)
