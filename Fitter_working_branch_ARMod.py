@@ -2,7 +2,7 @@ import numpy as np
 from lmfit import Parameters, minimize
 import pandas as pd
 
-from models import gaussFit, gaussian
+from models import gaussFit
 """
 This function takes in the data and the lines I want to fit as files,
 the coordinates in the data and, some initial guesses as well as an
@@ -18,9 +18,6 @@ wg = Initial guess of FWHM, used for masking lines
 aMax = The maximum amplitude. Mostly used in troubleshooting
 windows = Whether or not to plot the unmasked windows where we look for lines
 """
-
-
-#def get_ha_wl_guess(wl, flux, zguess, winwidth=100):
 
 def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
     # Using mpdaf.obj to get the spectrum at xPix and yPix
@@ -51,13 +48,12 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
     # Setting up for some masking and initial guesses for fitting
    
     zguess = zg # Inital guess of redshift
-    # if type(zg) != float and type(zg) != np.float64:
-    #     zguess = 2.7
+
     
     # It seems that the width becomes really small
     # It should not be able to be less than 
 
-    #wguess = np.max([float(wg), 2])
+
     wguess = wg
     if wguess < 1.4:
         wguess = 1.4
@@ -69,10 +65,6 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
     for u, line in enumerate(wl_air):
         Center = line*(1+zguess)
         Width = 300
-        # print('\tCenter: ', Center)
-        # print('\tZguess: ', zguess)
-        # print('\tLine: ', line)
-        # print('\tWidth: ', Width)
 
         fluxMask[np.where(np.abs(df['wl'].values-Center) <= Width)] = flux.values[np.where(np.abs(df['wl'].values-Center) <= Width)] 
 
@@ -97,7 +89,7 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
     for u, amp in enumerate(amps):
         pars.add(amp, strength[u], True, -1000, aMax)
     
-    pars.add("z", zg, True, zg-1e-3, zg+1e-3)
+    pars.add("z", zg, True, zg-1e-3, zg+1e-3) # Using zguess here does not work for some reason
     pars.add("wid", wguess, True, 0, 10)
     # Minimizing residual and retrieving results
     print("Fitting")
@@ -109,9 +101,7 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
     if wid.stderr is None:
         wid_err = 1e10
 
-
-    # print(wid.stderr)
-    # Putting amplitudes (and errors) in array, calculating fluxes and, 
+    # Putting amplitudes (and errors) in array, calculating fluxes and,
     # calculating errors on fluxes and putting in the arrays
     
     amp = np.array([])
@@ -137,7 +127,6 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
             ferr = 1e10
 
         else:
-            # print(f"a: {a}, a_err: {a_err}, wid: {wid.value}, wid_err: {wid_err}")
             fl = a*wid.value*4*np.sqrt(np.log(2)*np.pi)
             ferr = np.sqrt((a_err/a)**2+(wid_err/wid)**2)*fl
 
@@ -145,9 +134,7 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
         amp = np.append(amp, a)
         flux = np.append(flux, fl)
         flux_err = np.append(flux_err, ferr)
-        # print(type(wid_err))
-            # flux[i] = 0
-            # print("Flux error could not be estimated\nAssuming no line detected")
+
         
 
         i += 1

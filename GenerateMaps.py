@@ -1,64 +1,59 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from models import *
 # from Fitter_working import fit
 from Fitter_working_branch_ARMod import fit
 from mpdaf.obj import Cube
 from models import gaussFit
 
-# path = "/Data/J0156/" Don't know why this stopped working...
-path = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/"
-dataFile = path+"J0156_DATACUBE_FINAL.fits"
-cube = Cube(filename = dataFile)
+# PATH = "/Data/J0156/" Don't know why this stopped working...
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/"
+DATA = PATH+"J0156_DATACUBE_FINAL.fits"
+cube = Cube(filename = DATA)
 
 
 # For now this is just a semi-random range around the center
-xRange = np.arange(140, 170, step=1)
-yRange = np.arange(140, 170, step=1)
+xRange = np.arange(140, 180, step=1)
+yRange = np.arange(130, 170, step=1)
 
 
 
 lines = pd.read_csv("Lines.txt", sep = r"\s+")
 # The guess for z is what I think it "should" be, the FWHM guess is just random
-zval = 0.27
-widval = 2.0
+ZVAL = 0.27
+WIDVAL = 2.0
 
 # There's probably a better way to set up this loop rather than the nested loops I have now
-for i in range(len(xRange)):
+for x in xRange:
     # I feel like I want to pass in a different z when I go back to the other edge
     # for now it's just the one I had at the start
-    zval = 0.27
-    for u in range(len(yRange)):
-        xPix = xRange[i]
-        yPix = yRange[u]
-        print(zval)
-        result, df, fitResult = fit(cube, lines, xPix, yPix, zval, widval, windows=True)
+    ZVAL = 0.27
+    for y in yRange:
+        result, df, fitResult = fit(cube, lines, x, y, ZVAL, WIDVAL)
         z = result.params["z"]
-        
 
-        print(f"[{xPix},{yPix}] run successfully") 
+        print(f"[{x},{y}] run successfully")
         # The dataframe doesn't like saving things of different lenghts
-        # so I just set up a column with one value repeated all the way down
+        # so I set up a column with one value repeated all the way down
         # to save in the dataframe for z, z_err, FWHM, and FWHM_err
 
         # The try/except was set up to try to prevent it from breaking when z error
         # can't be estimated
-        # This never returns zval as an array. I've checked that
+        # This never returns ZVAL as an array. I've checked that
         length = np.ones_like(fitResult["flux"])
         
         try:
             zs = length*z.value
             zerrs = length*z.stderr
-            zval = z.value
+            ZVAL = z.value
             
         except:
-            zval = z.value
+            ZVAL = z.value
             zerrs=length*999
 
         wid = result.params["wid"]
-        widval = np.abs(wid.value)
-        ws = length*widval
+        WIDVAL = np.abs(wid.value)
+        ws = length*WIDVAL
         try:
             werrs = length*wid.stderr
         except:
@@ -69,12 +64,12 @@ for i in range(len(xRange)):
         fitResult["zerr"] = zerrs
         fitResult["FWHM"] = ws
         fitResult["FWHMerr"] = werrs
-        fitResult.to_csv(path+"results/fitResult"+str(xPix)+"_"+str(yPix), index=False)
-        """ 
+        fitResult.to_csv(PATH+"results/fitResult"+str(x)+"_"+str(y), index=False)
+        """
         plt.plot(result["wl"],result["flux0"], label="Flux")
         plt.plot(result["wl"],gaussFit(result.params, lines = lines), label="Fit")
-        title = "Pix ("+str(xPix)+","+str(yPix)+"), z="+str(zval)
+        title = "Pix ("+str(xPix)+","+str(yPix)+"), z="+str(ZVAL)
         plt.title(title)
         plt.legend(loc=(1,0))
-        plt.savefig(path+"results/figs/"+str(xPix)+"_"+str(yPix))
+        plt.savefig(PATH+"results/figs/"+str(xPix)+"_"+str(yPix))
         """

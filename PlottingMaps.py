@@ -1,20 +1,19 @@
+import re
+from glob import glob
+from natsort import natsorted
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
-from matplotlib import cm
 import pandas as pd
-from glob import glob
-import re
-from natsort import natsorted
 from astropy import constants as const
 
 def prep(array, shape):
-    array[array == 0] = None
+    array[array == 0] = np.nan
     return np.rot90(array.reshape(shape))
 
-# path = "/Data/J0156/results"
-path = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/"
-c = const.c.value/1e3
+# PATH = "/Data/J0156/results"
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/"
+c = const.c.value/1e3 # speed of light in km/s
 
 Ha = ([])
 Othree = ([])
@@ -27,12 +26,12 @@ OIII_4363_arr = ([])
 
 O32 = ([])
 # Reading all fitResults
-filelist = natsorted(glob(path+"fitResult*"))
+filelist = natsorted(glob(PATH+"fitResult*"))
 
 
 for i, file in enumerate(filelist):
     df = pd.read_csv(file)
-    file = file.replace(path,'')
+    file = file.replace(PATH,'')
     # I'm pretty sure there is a better way to find these two
     # just didn't have them at time of writing and this seems to work okay
     H1 = df.query("line=='HI_6563'")["flux"].values
