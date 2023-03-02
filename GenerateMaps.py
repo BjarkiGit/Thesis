@@ -47,13 +47,15 @@ for x in xRange:
             zerrs = length*z.stderr
             ZVAL = z.value
             
-        except:
+        except Exception as e:
             ZVAL = z.value
             zerrs=length*999
+            raise(e)
 
         wid = result.params["wid"]
         WIDVAL = np.abs(wid.value)
         ws = length*WIDVAL
+
         try:
             werrs = length*wid.stderr
         except:
@@ -65,10 +67,12 @@ for x in xRange:
         fitResult["FWHM"] = ws
         fitResult["FWHMerr"] = werrs
         fitResult.to_csv(PATH+"results/fitResult"+str(x)+"_"+str(y), index=False)
+
         if fitResult["flux"][0]/fitResult["flux_err"][0] < 0.5:
             ZVAL = 0.27
 
-        """
+        # I want to save a plot of all the fits, just haven't figured out how yet
+        """ 
         plt.plot(result["wl"],result["flux0"], label="Flux")
         plt.plot(result["wl"],gaussFit(result.params, lines = lines), label="Fit")
         title = "Pix ("+str(xPix)+","+str(yPix)+"), z="+str(ZVAL)
