@@ -90,7 +90,7 @@ def fit(cube, linefile, xPix, yPix, zg, wg, aMax=50000):
         pars.add(amp, strength[u], True, -1000, aMax)
     
     pars.add("z", zg, True, zg-1e-3, zg+1e-3) # Using zguess here does not work for some reason
-    pars.add("wid", wguess, True, 0, 10)
+    pars.add("wid", wguess, True, 1.4, 10)
     # Minimizing residual and retrieving results
     print("Fitting")
     result = minimize(gaussFit, pars, args=(df["wl"].values,), kws={"f":df["maskFlux"].values, "lines":wl_air}, nan_policy="omit")

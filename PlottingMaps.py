@@ -101,8 +101,8 @@ brightest_pixel = np.unravel_index(np.nanargmax(Ha_mask), Ha_mask.shape)
 
 
 brightest_z = z_mask[brightest_pixel]
-z_mask = z_mask - brightest_z
-z_mask = z_mask*c
+z_mask_norm = z_mask - brightest_z
+z_mask_v = z_mask_norm*c
 
 
 heat_map = cmap = plt.cm.get_cmap("hot").copy()
@@ -115,33 +115,62 @@ plt.imshow(Ha_mask, cmap=heat_map, interpolation="nearest", norm=LogNorm(vmin=np
 cbar = plt.colorbar()
 cbar.set_label(r"10$^{-20}$ erg cm$^{-2} s^{-1}$")
 plt.title(r"H$\alpha$")
-plt.show()
+plt.savefig(PATH+"figs/Ha.pdf")
+plt.savefig(PATH+"figs/Ha.png")
+plt.clf()
 
 plt.imshow(Othree_mask, cmap=heat_map, interpolation="nearest", norm=LogNorm(vmin=np.nanmin(Ha_mask), vmax=np.nanmax(Ha_mask)))
 cbar2 = plt.colorbar()
 cbar2.set_label(r"10$^{-20}$ erg cm$^{-2} s^{-1}$")
 plt.title(r"[OIII]")
-plt.show()
+plt.savefig(PATH+"figs/OIII.pdf")
+plt.savefig(PATH+"figs/OIII.png")
+plt.clf()
 
 plt.imshow(OIII_4363_arr, cmap=heat_map, interpolation="nearest", norm=LogNorm(vmin=np.nanmin(OIII_4363_arr), vmax=np.nanmax(OIII_4363_arr)))
 cbar3 = plt.colorbar()
 cbar3.set_label(r"10$^{-20}$ erg cm$^{-2} s^{-1}$")
-plt.title(r"[OIII_4363]")
-plt.show()
-
+plt.title(r"[OIII] 4363")
+plt.savefig(PATH+"figs/OIII_4363.pdf")
+plt.savefig(PATH+"figs/OIII_4363.png")
+plt.clf()
 
 plt.imshow(O32, cmap=gre, interpolation="nearest", norm=LogNorm(vmin=0.1, vmax=2))
 cbar4 = plt.colorbar()
-cbar4.set_label(r"10$^{-20}$ erg cm$^{-2} s^{-1}$")
+# cbar4.set_label(r"")
 plt.title(r"[OIII]/[OII]")
-plt.show()
-
+plt.savefig(PATH+"figs/O32.pdf")
+plt.savefig(PATH+"figs/O32.png")
+plt.clf()
 
 
 cmap = plt.cm.get_cmap("coolwarm").copy()
 cmap.set_bad('black',1.)
-plt.imshow(z_mask, cmap=cmap, interpolation="nearest", vmin = -0.00015*c, vmax = 0.00015*c)
+plt.imshow(z_mask_v, cmap=cmap, interpolation="nearest", vmin = -0.00015*c, vmax = 0.00015*c)
 cbar5 = plt.colorbar()
 cbar5.set_label(r"km s$^{-1}$")
 plt.title(r"$z$")
-plt.show()
+plt.savefig(PATH+"figs/z.pdf")
+plt.savefig(PATH+"figs/z.png")
+plt.clf()
+
+
+"""
+plt.imshow(z_mask, cmap=cmap, interpolation="nearest", norm=LogNorm(vmin = 2.695e-1, vmax = 2.703e-1))
+cbar5 = plt.colorbar()
+# cbar5.set_label(r"km s$^{-1}$")
+plt.title(r"$z$")
+plt.savefig(PATH+"figs/z_log.pdf")
+plt.savefig(PATH+"figs/z_log.png")
+plt.clf()
+
+
+
+plt.imshow(z_mask, cmap=cmap, interpolation="nearest", vmin = 10, vmax = 300)
+cbar5 = plt.colorbar()
+cbar5.set_label(r"km s$^{-1}$")
+plt.title(r"$z$")
+plt.savefig(PATH+"figs/z_arm.pdf")
+plt.savefig(PATH+"figs/z_arm.png")
+plt.clf()
+"""

@@ -13,8 +13,8 @@ cube = Cube(filename = DATA)
 
 
 # For now this is just a semi-random range around the center
-xRange = np.arange(140, 180, step=1)
-yRange = np.arange(130, 170, step=1)
+xRange = np.arange(140, 180, step=1) # 140, 180 is a good range for J0156
+yRange = np.arange(130, 170, step=1) # 130, 170 is a good range for J0156
 
 
 
@@ -65,6 +65,9 @@ for x in xRange:
         fitResult["FWHM"] = ws
         fitResult["FWHMerr"] = werrs
         fitResult.to_csv(PATH+"results/fitResult"+str(x)+"_"+str(y), index=False)
+        if fitResult["flux"][0]/fitResult["flux_err"][0] < 0.5:
+            ZVAL = 0.27
+
         """
         plt.plot(result["wl"],result["flux0"], label="Flux")
         plt.plot(result["wl"],gaussFit(result.params, lines = lines), label="Fit")
