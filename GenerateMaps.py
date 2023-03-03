@@ -67,8 +67,9 @@ for x in xRange:
 
         try:
             werrs = length*wid.stderr
-        except:
+        except Exception as e:
             werrs = length*999
+            print(e)
 
         # Adding to the fitResult dataframe and saving with the name of the pixel
         fitResult["z"] = zs
