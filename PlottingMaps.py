@@ -8,7 +8,8 @@ This script loads the arrays saved by MakingArrays.py and plots them using
 custom colour maps. These are then saved as .pdf and .png files
 """
 
-PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/maps/"
+# PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/maps/"
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/results/maps/"
 c = const.c.value/1e3 # speed of light in km/s, used for kinematic plotting
 
 
@@ -20,7 +21,7 @@ OIII_4363 = np.load(PATH+"OIII_4363_arr.npy")
 z_mask = np.load(PATH+"z_mask.npy")
 z_mask_v = np.load(PATH+"z_mask_v.npy")
 O32 = np.load(PATH+"O32.npy")
-print(OIII_4363)
+
 
 
 # Making the heatmaps with black nan values

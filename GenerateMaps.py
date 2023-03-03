@@ -7,29 +7,38 @@ from mpdaf.obj import Cube
 from models import gaussFit
 
 # PATH = "/Data/J0156/" Don't know why this stopped working...
+
+
+
+"""
+# For J0156
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/"
 DATA = PATH+"J0156_DATACUBE_FINAL.fits"
-cube = Cube(filename = DATA)
-
-
-# For now this is just a semi-random range around the center
-xRange = np.arange(140, 180, step=1) # 140, 180 is a good range for J0156
-yRange = np.arange(130, 170, step=1) # 130, 170 is a good range for J0156
-
+xRange = np.arange(140, 180, step=1) # J0156
+yRange = np.arange(130, 170, step=1) # J0156
+Z_INIT = 0.27 # J0156
+"""
+# For J0004
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/"
+DATA = PATH+"J0004_DATACUBE_FINAL.fits"
+xRange = np.arange(155, 175, step=1) # J0004
+yRange = np.arange(150, 170, step=1) # J0004
+Z_INIT = 0.24 # J0004
 
 
 lines = pd.read_csv("Lines.txt", sep = r"\s+")
+cube = Cube(filename = DATA)
 # The guess for z is what I think it "should" be, the FWHM guess is just random
-ZVAL = 0.27
+z_val = Z_INIT
 WIDVAL = 2.0
 
 # There's probably a better way to set up this loop rather than the nested loops I have now
 for x in xRange:
     # I feel like I want to pass in a different z when I go back to the other edge
     # for now it's just the one I had at the start
-    ZVAL = 0.27
+    z_val = Z_INIT
     for y in yRange:
-        result, df, fitResult = fit(cube, lines, x, y, ZVAL, WIDVAL)
+        result, df, fitResult = fit(cube, lines, x, y, z_val, WIDVAL)
         z = result.params["z"]
 
         print(f"[{x},{y}] run successfully")
@@ -39,18 +48,18 @@ for x in xRange:
 
         # The try/except was set up to try to prevent it from breaking when z error
         # can't be estimated
-        # This never returns ZVAL as an array. I've checked that
+        # This never returns z_val as an array. I've checked that
         length = np.ones_like(fitResult["flux"])
         
         try:
             zs = length*z.value
             zerrs = length*z.stderr
-            ZVAL = z.value
+            z_val = z.value
             
         except Exception as e:
-            ZVAL = z.value
+            z_val = z.value
             zerrs=length*999
-            raise(e)
+            print(e)
 
         wid = result.params["wid"]
         WIDVAL = np.abs(wid.value)
@@ -69,14 +78,17 @@ for x in xRange:
         fitResult.to_csv(PATH+"results/fitResult"+str(x)+"_"+str(y), index=False)
 
         if fitResult["flux"][0]/fitResult["flux_err"][0] < 0.5:
-            ZVAL = 0.27
+            z_val = Z_INIT
 
         # I want to save a plot of all the fits, just haven't figured out how yet
-        """ 
-        plt.plot(result["wl"],result["flux0"], label="Flux")
-        plt.plot(result["wl"],gaussFit(result.params, lines = lines), label="Fit")
-        title = "Pix ("+str(xPix)+","+str(yPix)+"), z="+str(ZVAL)
-        plt.title(title)
-        plt.legend(loc=(1,0))
-        plt.savefig(PATH+"results/figs/"+str(xPix)+"_"+str(yPix))
         """
+        WL = df["wl"].values
+
+        plt.plot(WL, df["flux0"], label="Flux")
+        plt.plot(WL, gaussFit(result.params, WL, lines = lines), label="Fit")
+        TITLE = "Pix ("+str(x)+","+str(y)+"), z="+str(z_val)
+        plt.title(TITLE)
+        plt.legend(loc=(1,0))
+        plt.savefig(PATH+"results/figs/test/"+str(x)+"_"+str(y)+".pdf")
+        """
+       

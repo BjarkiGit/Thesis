@@ -1,17 +1,17 @@
-import numpy as np
+
 import matplotlib.pyplot as plt
 from mpdaf.obj import Cube
-from models import *
-from astropy.io import fits as f
-path = "Data/J0156/"
-dataFile = path+"J0156_DATACUBE_FINAL.fits"
 
-cube = Cube(filename=dataFile)
-hdul = f.open(dataFile)
+from astropy.io import fits as f
+PATH = "Data/J0004/"
+DATA = PATH+"J0004_DATACUBE_FINAL.fits"
+
+cube = Cube(filename=DATA)
+hdul = f.open(DATA)
 
 # im = np.array(cube[1199,:,:].data)
-im = hdul[1].data[2980]
-spe = cube[:,150,160]
+im = hdul[1].data[2700]
+spe = cube[:,165,160]
 
 
 plt.imshow(im, cmap='hot', interpolation='nearest')

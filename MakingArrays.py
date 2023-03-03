@@ -17,7 +17,8 @@ def prep(array, shape):
     return np.rot90(array.reshape(shape))
 
 
-PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/"
+# PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/"
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/results/"
 c = const.c.value/1e3 # speed of light in km/s, used for kinematics
 
 
