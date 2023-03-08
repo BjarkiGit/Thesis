@@ -18,7 +18,7 @@ def prep(array, shape):
 
 
 # PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/"
-PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/results/"
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/results/test/"
 c = const.c.value/1e3 # speed of light in km/s, used for kinematics
 
 
@@ -75,14 +75,13 @@ for i, file in enumerate(filelist):
         xMax = xPix
         yMax = yPix
 
-
     Ha = np.append(Ha, H1)
     Othree = np.append(Othree, O3)
     zed = np.append(zed, z)
     zederr = np.append(zederr, zerr)
 
     # Making a mask from the SNR of Halpha
-    if H1/H1_err > 1:
+    if H1/H1_err > 0:
         z_mask = np.append(z_mask, z)
         Ha_mask = np.append(Ha_mask, H1)
         Othree_mask = np.append(Othree_mask, O3)
@@ -107,7 +106,6 @@ x = xMax-xMin+1
 y = yMax-yMin+1
 shape = (x,y)
 
-
 # Reshaping arrays
 Ha_mask = prep(Ha_mask, shape)
 z_mask = prep(z_mask, shape)
@@ -118,16 +116,14 @@ OIII_4363_arr = prep(OIII_4363_arr, shape)
 # Finding the brightest pixel of H_alpha which we use to make the kinematic z map
 brightest_pixel = np.unravel_index(np.nanargmax(Ha_mask), Ha_mask.shape)
 
-
 brightest_z = z_mask[brightest_pixel]
 z_mask_norm = z_mask - brightest_z
 z_mask_v = z_mask_norm*c
 
-
 # Saving all the arrays
-np.save(PATH+"/maps/Ha_mask", Ha_mask)
-np.save(PATH+"/maps/z_mask", z_mask)
-np.save(PATH+"/maps/z_mask_v", z_mask_v)
-np.save(PATH+"/maps/Othree_mask", Othree_mask)
-np.save(PATH+"/maps/O32", O32)
-np.save(PATH+"/maps/OIII_4363_arr", OIII_4363_arr)
+np.save(PATH+"maps/Ha_mask", Ha_mask)
+np.save(PATH+"maps/z_mask", z_mask)
+np.save(PATH+"maps/z_mask_v", z_mask_v)
+np.save(PATH+"maps/Othree_mask", Othree_mask)
+np.save(PATH+"maps/OIII_4363_arr", OIII_4363_arr)
+np.save(PATH+"maps/O32", O32)
