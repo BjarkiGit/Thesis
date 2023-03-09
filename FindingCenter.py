@@ -9,8 +9,8 @@ from mpdaf.obj import Cube, Image
 from astropy.io import fits as f
 
 
-PATH = "Data/J0139/"
-DATA = PATH+"J0139_DATACUBE_FINAL.fits"
+PATH = "Data/J0232/"
+DATA = PATH+"J0232_DATACUBE_FINAL.fits"
 
 cube = Cube(filename=DATA)
 hdul = f.open(DATA)

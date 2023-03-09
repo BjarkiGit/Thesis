@@ -10,31 +10,44 @@ from astropy.io import fits as f
 from models import gaussFit
 from loguru import logger
 
-logger.add("J0139_{time}.log")
+logger.add("J0232_{time}.log")
 
 """
-# For J0156
+# For J0156 # Run with SNR mask 1
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/"
 DATA = PATH+"J0156_DATACUBE_FINAL.fits"
 xRange = np.arange(140, 180, step=1) # J0156
 yRange = np.arange(130, 170, step=1) # J0156
 Z_INIT = 0.2696 # J0156
 
-# For J0004
+# For J0004 # Run with SNR mask 1.5
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/"
 DATA = PATH+"J0004_DATACUBE_FINAL.fits"
 xRange = np.arange(140, 180, step=1) # J0004
 yRange = np.arange(140, 180, step=1) # J0004
 Z_INIT = 0.2386 # J0004
-"""
 
-# For J0139
+# For J0139 # Run with SNR mask 1.5
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0139/"
 DATA = PATH+"J0139_DATACUBE_FINAL.fits"
 xRange = np.arange(140, 180, step=1) # J0139
 yRange = np.arange(140, 180, step=1) # J0139
 Z_INIT = 0.3073 # J0139
 
+# For J0232 # Run with SNR mask 1
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0232/"
+DATA = PATH+"J0232_DATACUBE_FINAL.fits"
+xRange = np.arange(140, 180, step=1) # J0232
+yRange = np.arange(140, 180, step=1) # J0232
+Z_INIT = 0.3095 # J0232
+"""
+
+# For J2318 # Run with SNR mask 1
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J2318/"
+DATA = PATH+"J2318_DATACUBE_FINAL.fits"
+xRange = np.arange(140, 180, step=1) # J2318
+yRange = np.arange(140, 180, step=1) # J2318
+Z_INIT = 0.2517 # J2318
 lines = pd.read_csv("Lines.txt", sep = r"\s+")
 cube = Cube(filename = DATA)
 var = f.open(DATA)[2].data
@@ -78,7 +91,7 @@ for x in xRange:
                     
                 except Exception as e:
                     zerrs=length*999
-                    logger.info("Got bad error estimation for pixel: ", printname, "with SNR: ", SNR)
+                    logger.info("Got bad error estimation for pixel: ", str(x)+","+str(y), "with SNR: ", str(round(SNR,5)))
 
 
                 wid = result.params["wid"]
@@ -92,7 +105,7 @@ for x in xRange:
                     werrs = length*999
 
             else:
-                logger.info("Bad SNR ("+str(SNR)+") for pixel", printname)
+                logger.info("Bad SNR ("+str(round(SNR,5))+") for pixel "+str(x)+","+str(y))
                 length = np.ones_like(fitResult["flux"])
                 zerrs = length*999
                 werrs = length*999
@@ -105,7 +118,7 @@ for x in xRange:
             fitResult["FWHM"] = ws
             fitResult["FWHMerr"] = werrs
             fitResult.to_csv(name, index=False)
-            print(name, "saved")
+            # print(name, "saved")
 
             # I want to save a plot of all the fits, just haven't figured out how yet
             """

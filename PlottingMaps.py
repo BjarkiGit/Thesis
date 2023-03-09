@@ -11,7 +11,9 @@ custom colour maps. These are then saved as .pdf and .png files
 
 # PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/maps/"
 # PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/results/maps/"
-PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0139/results/maps/"
+# PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0139/results/maps/"
+# PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0232/results/maps/"
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J2318/results/maps/"
 c = const.c.value/1e3 # speed of light in km/s, used for kinematic plotting
 
 

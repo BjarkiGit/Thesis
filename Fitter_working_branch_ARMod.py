@@ -17,8 +17,7 @@ zg = Initial guess for z, used for masking lines
 wg = Initial guess of FWHM, used for masking lines
 """
 
-def bad_fit(size, SNR):
-    print(f"Bad fit, SNR = {SNR}")
+def bad_fit(size):
     output = np.zeros_like(size)
     result = None
     amp = output
@@ -32,7 +31,7 @@ def fit(cube, linefile, Var, xPix, yPix, zg, wg):
     spe = cube[:, yPix, xPix]
     var = Var[:, yPix, xPix]
     noisy = False
-    MASK = 1.5
+    MASK = 1
     # The wavelengths are not saved as an array in the cube,
     # but we have the start, stop and, step size so we can make one
     wl_range = spe.get_range()
@@ -150,11 +149,10 @@ def fit(cube, linefile, Var, xPix, yPix, zg, wg):
                 flux_err = np.append(flux_err, ferr)
 
         except Exception as e:
-            print(e)
-            result, amp, amp_err, flux, flux_err = bad_fit(wl_air, SNR)
+            result, amp, amp_err, flux, flux_err = bad_fit(wl_air)
 
     else:
-        result, amp, amp_err, flux, flux_err = bad_fit(wl_air, SNR)
+        result, amp, amp_err, flux, flux_err = bad_fit(wl_air)
         
     # Saving fluxes and amplitudes of each line into a dataframe.
     fitResult = pd.DataFrame({"line":lineName, "wl":wl_air, "amp":amp, "amp_err":amp_err,
