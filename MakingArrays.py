@@ -18,7 +18,8 @@ def prep(array, shape):
 
 
 # PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/results/"
-PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/results/test/"
+# PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/results/"
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0139/results/"
 c = const.c.value/1e3 # speed of light in km/s, used for kinematics
 
 

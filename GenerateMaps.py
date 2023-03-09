@@ -8,8 +8,9 @@ from Fitter_working_branch_ARMod import fit
 from mpdaf.obj import Cube
 from astropy.io import fits as f
 from models import gaussFit
+from loguru import logger
 
-
+logger.add("J0139_{time}.log")
 
 """
 # For J0156
@@ -32,7 +33,7 @@ PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0139/"
 DATA = PATH+"J0139_DATACUBE_FINAL.fits"
 xRange = np.arange(140, 180, step=1) # J0139
 yRange = np.arange(140, 180, step=1) # J0139
-Z_INIT = 0.2386 # J0004
+Z_INIT = 0.3073 # J0139
 
 lines = pd.read_csv("Lines.txt", sep = r"\s+")
 cube = Cube(filename = DATA)
@@ -55,9 +56,10 @@ for x in xRange:
             
         else:
             print("Running pixel ["+printname+"]")
-            result, df, fitResult = fit(cube, lines, var, x, y, z_val, WIDVAL)
+            result, df, fitResult, SNR = fit(cube, lines, var, x, y, z_val, WIDVAL)
             if result is not None:
                 z = result.params["z"]
+
 
                 print("Fit successfully")
                 # The dataframe doesn't like saving things of different lenghts
@@ -76,7 +78,8 @@ for x in xRange:
                     
                 except Exception as e:
                     zerrs=length*999
-                    print(e," in z calculation")
+                    logger.info("Got bad error estimation for pixel: ", printname, "with SNR: ", SNR)
+
 
                 wid = result.params["wid"]
                 WIDVAL = np.abs(wid.value)
@@ -87,8 +90,9 @@ for x in xRange:
 
                 except Exception as e:
                     werrs = length*999
-                    print(e, "in FWHM calculation")
+
             else:
+                logger.info("Bad SNR ("+str(SNR)+") for pixel", printname)
                 length = np.ones_like(fitResult["flux"])
                 zerrs = length*999
                 werrs = length*999

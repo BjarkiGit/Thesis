@@ -17,6 +17,16 @@ zg = Initial guess for z, used for masking lines
 wg = Initial guess of FWHM, used for masking lines
 """
 
+def bad_fit(size, SNR):
+    print(f"Bad fit, SNR = {SNR}")
+    output = np.zeros_like(size)
+    result = None
+    amp = output
+    amp_err = output + 1e10
+    flux = output
+    flux_err = output + 1e10
+    return result, amp, amp_err, flux, flux_err
+
 def fit(cube, linefile, Var, xPix, yPix, zg, wg):
     # Using mpdaf.obj to get the spectrum at xPix and yPix
     spe = cube[:, yPix, xPix]
@@ -75,7 +85,8 @@ def fit(cube, linefile, Var, xPix, yPix, zg, wg):
             st = np.max(fluxMask)
             var_sum = np.sqrt(np.sum(var[wl_index-WIDTH:wl_index+WIDTH]))
             flux_sum = np.sum(flux[wl_index-WIDTH:wl_index+WIDTH])
-            if flux_sum/var_sum < MASK:
+            SNR = flux_sum/var_sum
+            if SNR < MASK:
                 noisy = True
 
     # Setting the strength of the lines based on the amplitude of H\alpha
@@ -95,58 +106,56 @@ def fit(cube, linefile, Var, xPix, yPix, zg, wg):
         pars.add("wid", wguess, True, 1.4, 10)
         # Minimizing residual and retrieving results
         # print("Fitting")
-        result = minimize(gaussFit, pars, args=(df["wl"].values,), kws={"f":df["maskFlux"].values, "lines":wl_air}, nan_policy="omit")
+        try:
+            result = minimize(gaussFit, pars, args=(df["wl"].values,), kws={"f":df["maskFlux"].values, "lines":wl_air}, nan_policy="omit")
 
-        wid = result.params["wid"]
-        wid_err = wid.stderr
+            wid = result.params["wid"]
+            wid_err = wid.stderr
 
-        if wid.stderr is None:
-            wid_err = 1e10
+            if wid.stderr is None:
+                wid_err = 1e10
 
-        # Putting amplitudes (and errors) in array, calculating fluxes and,
-        # calculating errors on fluxes and putting in the arrays
-        
-        amp = np.array([])
-        amp_err = np.array([])
-        flux = ([])
-        flux_err = ([])
+            # Putting amplitudes (and errors) in array, calculating fluxes and,
+            # calculating errors on fluxes and putting in the arrays
+            
+            amp = np.array([])
+            amp_err = np.array([])
+            flux = ([])
+            flux_err = ([])
 
-        for i, am in enumerate(amps):
-            ap = result.params[am]
-            a = ap.value
-            # This checks if the error was estimated and set's the
-            # error to 1e10 if it wasn't
-            if ap.stderr is None:
-                a_err = 1e10
-            else:
-                a_err = ap.stderr
-            # Checking if the amplitude is negative
-            # if so, set amplitude and flux to 0 and errors to 1e10
-            if a <= 0:
-                a = 0
-                a_err = 1e10
-                fl = 0
-                ferr = 1e10
+            for am in amps:
+                ap = result.params[am]
+                a = ap.value
+                # This checks if the error was estimated and set's the
+                # error to 1e10 if it wasn't
+                if ap.stderr is None:
+                    a_err = 1e10
+                else:
+                    a_err = ap.stderr
+                # Checking if the amplitude is negative
+                # if so, set amplitude and flux to 0 and errors to 1e10
+                if a <= 0:
+                    a = 0
+                    a_err = 1e10
+                    fl = 0
+                    ferr = 1e10
 
-            else:
-                fl = a*wid.value*4*np.sqrt(np.log(2)*np.pi)
-                ferr = np.sqrt((a_err/a)**2+(wid_err/wid)**2)*fl
+                else:
+                    fl = a*wid.value*4*np.sqrt(np.log(2)*np.pi)
+                    ferr = np.sqrt((a_err/a)**2+(wid_err/wid)**2)*fl
 
-            amp_err = np.append(amp, a_err)
-            amp = np.append(amp, a)
-            flux = np.append(flux, fl)
-            flux_err = np.append(flux_err, ferr)
+                amp_err = np.append(amp, a_err)
+                amp = np.append(amp, a)
+                flux = np.append(flux, fl)
+                flux_err = np.append(flux_err, ferr)
 
-            i += 1
+        except Exception as e:
+            print(e)
+            result, amp, amp_err, flux, flux_err = bad_fit(wl_air, SNR)
 
     else:
-        print(f"Bad fit, SNR = {flux_sum/var_sum}")
-        output = np.zeros_like(wl_air)
-        result = None
-        amp = output
-        amp_err = output + 1e10
-        flux = output
-        flux_err = output + 1e10
+        result, amp, amp_err, flux, flux_err = bad_fit(wl_air, SNR)
+        
     # Saving fluxes and amplitudes of each line into a dataframe.
     fitResult = pd.DataFrame({"line":lineName, "wl":wl_air, "amp":amp, "amp_err":amp_err,
 			"flux":flux, "flux_err":flux_err})
@@ -154,4 +163,4 @@ def fit(cube, linefile, Var, xPix, yPix, zg, wg):
 
     # Returning the minimizer.result the dataframe of the input data
     # and the amplitude and flux array
-    return result, df, fitResult
+    return result, df, fitResult, SNR
