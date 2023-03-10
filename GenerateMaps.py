@@ -13,13 +13,6 @@ from loguru import logger
 logger.add("J0232_{time}.log")
 
 """
-# For J0156 # Run with SNR mask 1
-PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/"
-DATA = PATH+"J0156_DATACUBE_FINAL.fits"
-xRange = np.arange(140, 180, step=1) # J0156
-yRange = np.arange(130, 170, step=1) # J0156
-Z_INIT = 0.2696 # J0156
-
 # For J0004 # Run with SNR mask 1.5
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0004/"
 DATA = PATH+"J0004_DATACUBE_FINAL.fits"
@@ -34,6 +27,13 @@ xRange = np.arange(140, 180, step=1) # J0139
 yRange = np.arange(140, 180, step=1) # J0139
 Z_INIT = 0.3073 # J0139
 
+# For J0156 # Run with SNR mask 1
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0156/"
+DATA = PATH+"J0156_DATACUBE_FINAL.fits"
+xRange = np.arange(140, 180, step=1) # J0156
+yRange = np.arange(130, 170, step=1) # J0156
+Z_INIT = 0.2696 # J0156
+
 # For J0232 # Run with SNR mask 1
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J0232/"
 DATA = PATH+"J0232_DATACUBE_FINAL.fits"
@@ -45,8 +45,8 @@ Z_INIT = 0.3095 # J0232
 # For J2318 # Run with SNR mask 1
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J2318/"
 DATA = PATH+"J2318_DATACUBE_FINAL.fits"
-xRange = np.arange(140, 180, step=1) # J2318
-yRange = np.arange(140, 180, step=1) # J2318
+xRange = np.arange(130, 190, step=1) # J2318
+yRange = np.arange(130, 190, step=1) # J2318
 Z_INIT = 0.2517 # J2318
 lines = pd.read_csv("Lines.txt", sep = r"\s+")
 cube = Cube(filename = DATA)
