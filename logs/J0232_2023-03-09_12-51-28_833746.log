@@ -1,0 +1,8 @@
+2023-03-09 12:51:31.828 | INFO     | __main__:<module>:103 - Bad SNR (-1.7926968144528808) for pixel
+2023-03-09 12:51:34.822 | INFO     | __main__:<module>:103 - Bad SNR (0.31050197607831814) for pixel
+2023-03-09 12:51:37.791 | INFO     | __main__:<module>:103 - Bad SNR (-0.33214129378577617) for pixel
+2023-03-09 12:51:40.780 | INFO     | __main__:<module>:103 - Bad SNR (-0.9811949819962086) for pixel
+2023-03-09 12:51:43.572 | INFO     | __main__:<module>:103 - Bad SNR (-0.7977015349460146) for pixel
+2023-03-09 12:51:49.584 | INFO     | __main__:<module>:103 - Bad SNR (-1.1910129972533618) for pixel
+2023-03-09 12:51:52.324 | INFO     | __main__:<module>:103 - Bad SNR (0.637799438639907) for pixel
+2023-03-09 12:51:55.363 | INFO     | __main__:<module>:103 - Bad SNR (0.859673473497392) for pixel
