@@ -2,8 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from photutils.aperture import aperture_photometry, CircularAnnulus
-from astropy import constants as const
-from astropy.cosmology import LambdaCDM
 from lmfit import Parameters, minimize
 from models import gaussFit
 
@@ -40,3 +38,10 @@ else:
 
 BIN_NUMBER = 10
 ANN_SIZE = Rmax/BIN_NUMBER
+CENTER = [160,160]
+
+R = np.arange(0.01, Rmax+ANN_SIZE, step=ANN_SIZE)
+
+for r in R:
+    mask = CircularAnnulus(CENTER, r, r+ANN_SIZE).to_mask
+    # Idk man
