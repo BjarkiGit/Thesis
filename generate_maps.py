@@ -59,8 +59,8 @@ elif NAME == "J2318":
     # For J2318 # Run with SNR mask 1
     PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/J2318/"
     DATA = PATH+"J2318_DATACUBE_FINAL.fits"
-    xRange = np.arange(130, 200, step=1) # J2318
-    yRange = np.arange(130, 200, step=1) # J2318
+    xRange = np.arange(120, 200, step=1) # J2318
+    yRange = np.arange(120, 200, step=1) # J2318
     Z_INIT = 0.2517 # J2318
     MASK = 1
 

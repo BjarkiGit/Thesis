@@ -16,11 +16,11 @@ def prep(array, shape):
     array[array == 0] = np.nan
     return np.rot90(array.reshape(shape))
 
-NAME = "J0156"
+# NAME = "J0156"
 # NAME = "J0004"
 # NAME = "J0139"
 # NAME = "J0232"
-# NAME = "J2318"
+NAME = "J2318"
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/"+NAME+"/results/"
 c = const.c.value/1e3 # speed of light in km/s, used for kinematics
 
@@ -84,7 +84,7 @@ for i, file in enumerate(filelist):
     zederr = np.append(zederr, zerr)
 
     # Making a mask from the SNR of Halpha
-    if H1/H1_err > 0:
+    if H1/H1_err > 1:
         z_mask = np.append(z_mask, z)
         Ha_mask = np.append(Ha_mask, H1)
         Othree_mask = np.append(Othree_mask, O3)

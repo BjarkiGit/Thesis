@@ -9,8 +9,8 @@ This script loads the arrays saved by MakingArrays.py and plots them using
 custom colour maps. These are then saved as .pdf and .png files
 You just give it the path of the data and the name of the galaxy
 """
-NAME = "J0156"
-# NAME = "J0004"
+# NAME = "J0156"
+NAME = "J0004"
 # NAME = "J0139"
 # NAME = "J0232"
 # NAME = "J2318"
@@ -27,6 +27,8 @@ z_mask = np.load(PATH+"z_mask.npy")
 z_mask_v = np.load(PATH+"z_mask_v.npy")
 O32 = np.load(PATH+"O32.npy")
 
+brightest_pixel = np.unravel_index(np.nanargmax(Ha_mask), Ha_mask.shape)
+print(brightest_pixel)
 
 # Making the heatmaps with black nan values
 heat_map = cmap = plt.cm.get_cmap("hot").copy()
@@ -37,6 +39,7 @@ cmap.set_bad('black',1.)
 # Plotting fluxes
 plt.imshow(Ha_mask, cmap=heat_map, interpolation="nearest",
            norm=LogNorm(vmin=np.nanmin(Ha_mask), vmax=np.nanmax(Ha_mask)))
+plt.scatter(brightest_pixel[1], brightest_pixel[0], color="red")
 cbar = plt.colorbar()
 cbar.set_label(r"10$^{-20}$ erg cm$^{-2} s^{-1}$")
 plt.suptitle(r"H$\alpha$", x=0.45)
