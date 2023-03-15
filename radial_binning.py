@@ -20,9 +20,6 @@ cosmo = LambdaCDM(H0 = H0, Om0 = 0.3, Ode0 = 0.7)
 
 names = ("J0004","J0156","J0139","J0232","J2318")
 
-def Area(r_in, r_out):
-    return np.pi*(r_out**2-r_in**2)
-
 def kpc_convert(R,z):
     sec_rad = np.pi/(10800*60)
     d_A = cosmo.angular_diameter_distance(z).value*1e3
@@ -31,14 +28,13 @@ def kpc_convert(R,z):
 def flux_binning(r, map):
     annulus = CircularAnnulus(CENTER, r, r+ANN_SIZE)
     total_flux = aperture_photometry(map, annulus)["aperture_sum"]
-    avg_flux = total_flux/Area(r,r+ANN_SIZE)
+    avg_flux = total_flux/annulus.area
     return avg_flux*PX_SCALE**2*1e2
 
 
 for NAME in names:
 
     PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/"+NAME+"/results/maps/"
-
 
     if NAME  == "J0004":
         z = 0.2386 # J0004
@@ -77,7 +73,7 @@ for NAME in names:
     O32_map[np.isnan(O32_map)] = 0
 
     CENTER = np.unravel_index(np.nanargmax(Ha_map), Ha_map.shape)[::-1]
-    R = np.arange(0.1, Rmax+ANN_SIZE, step=ANN_SIZE)
+    R = np.arange(0.01, Rmax+ANN_SIZE, step=ANN_SIZE)
 
     Ha_binned_flux = np.array([])
     OIII_binned_flux = np.array([])

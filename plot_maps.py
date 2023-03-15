@@ -10,10 +10,10 @@ custom colour maps. These are then saved as .pdf and .png files
 You just give it the path of the data and the name of the galaxy
 """
 # NAME = "J0156"
-NAME = "J0004"
+# NAME = "J0004"
 # NAME = "J0139"
 # NAME = "J0232"
-# NAME = "J2318"
+NAME = "J2318"
 PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/"+NAME+"/results/maps/"
 c = const.c.value/1e3 # speed of light in km/s, used for kinematic plotting
 
@@ -21,6 +21,7 @@ c = const.c.value/1e3 # speed of light in km/s, used for kinematic plotting
 
 # Loading all the arrays
 Ha_mask = np.load(PATH+"Ha_mask.npy")
+Hb = np.load(PATH+"Hb_mask.npy")
 Othree_mask = np.load(PATH+"Othree_mask.npy")
 OIII_4363 = np.load(PATH+"OIII_4363_arr.npy")
 z_mask = np.load(PATH+"z_mask.npy")
@@ -28,19 +29,23 @@ z_mask_v = np.load(PATH+"z_mask_v.npy")
 O32 = np.load(PATH+"O32.npy")
 
 brightest_pixel = np.unravel_index(np.nanargmax(Ha_mask), Ha_mask.shape)
-print(brightest_pixel)
+# print(brightest_pixel)
+
+ext = Ha_mask/Hb
 
 # Making the heatmaps with black nan values
 heat_map = cmap = plt.cm.get_cmap("hot").copy()
 cmap.set_bad('black',1.)
 gre = cmap = plt.cm.get_cmap("plasma").copy()
 cmap.set_bad('black',1.)
+div = cmap = plt.cm.get_cmap("seismic").copy()
+cmap.set_bad('black',1.)
 
 # Plotting fluxes
 plt.imshow(Ha_mask, cmap=heat_map, interpolation="nearest",
            norm=LogNorm(vmin=np.nanmin(Ha_mask), vmax=np.nanmax(Ha_mask)))
-plt.scatter(brightest_pixel[1], brightest_pixel[0], color="red")
 cbar = plt.colorbar()
+plt.scatter(brightest_pixel[1], brightest_pixel[0], color="red")
 cbar.set_label(r"10$^{-20}$ erg cm$^{-2} s^{-1}$")
 plt.suptitle(r"H$\alpha$", x=0.45)
 plt.title(NAME, fontsize = "small")
@@ -81,6 +86,16 @@ plt.savefig(PATH+"figs/O32.pdf")
 plt.savefig(PATH+"figs/O32.png")
 plt.clf()
 
+
+plt.clf()
+plt.imshow(ext, cmap=div, interpolation="nearest", vmin=2.86-1.2, vmax=2.86+1.2)
+plt.suptitle(r"[H$\alpha$]/[H$\beta$]", x=0.45)
+cbar5 = plt.colorbar()
+plt.title(NAME, fontsize = "small")
+plt.savefig(PATH+"figs/Hba.pdf")
+plt.savefig(PATH+"figs/Hba.png")
+plt.show()
+plt.clf()
 # Making the colormap for kinematic maps with black nans
 cmap = plt.cm.get_cmap("coolwarm").copy()
 cmap.set_bad('black',1.)

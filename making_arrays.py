@@ -35,6 +35,7 @@ Ha_mask = ([])
 Othree_mask = ([])
 OIII_4363_arr = ([])
 O32 = ([])
+Hb = ([])
 
 # Reading all fitResults
 filelist = natsorted(glob(PATH+"fitResult*"))
@@ -54,6 +55,7 @@ for i, file in enumerate(filelist):
     O2 = df.query("line=='OII_3726'")["flux"].values + df.query("line=='OII_3729'")["flux"].values
     OIII_4363 = df.query("line=='OIII_4363'")["flux"].values
     OIII_4363_err = df.query("line=='OIII_4363'")["flux_err"].values
+    Hbeta = df.query("line == 'HI_4861'")["flux"].values
 
     if O2 == 0:
         rat = np.nan
@@ -89,6 +91,7 @@ for i, file in enumerate(filelist):
         Ha_mask = np.append(Ha_mask, H1)
         Othree_mask = np.append(Othree_mask, O3)
         O32 = np.append(O32, rat)
+        Hb = np.append(Hb, Hbeta)
 
     # Putting nans for masked values
     else:
@@ -96,6 +99,7 @@ for i, file in enumerate(filelist):
         Ha_mask = np.append(Ha_mask, np.nan)
         Othree_mask = np.append(Othree_mask, np.nan)
         O32 = np.append(O32, np.nan)
+        Hb = np.append(Hb, np.nan)
 
     # A seperate 0.5 SNR mask for OIII 4363, which is mostly a
     # curiosity for now
@@ -111,6 +115,7 @@ shape = (x,y)
 
 # Reshaping arrays
 Ha_mask = prep(Ha_mask, shape)
+Hb = prep(Hb, shape)
 z_mask = prep(z_mask, shape)
 Othree_mask = prep(Othree_mask, shape)
 O32 = prep(O32, shape)
@@ -130,3 +135,4 @@ np.save(PATH+"maps/z_mask_v", z_mask_v)
 np.save(PATH+"maps/Othree_mask", Othree_mask)
 np.save(PATH+"maps/OIII_4363_arr", OIII_4363_arr)
 np.save(PATH+"maps/O32", O32)
+np.save(PATH+"maps/Hb_mask", Hb)

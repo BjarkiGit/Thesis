@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-from photutils.aperture import aperture_photometry, CircularAnnulus
+from mpdaf.obj import Cube, iter_spe, iter_ima # iter_spe lets me loop over all spectra, iter_ima lets me loop over all images
+from astropy.io import fits as f
+from photutils.aperture import aperture_photometry, CircularAnnulus, CircularAperture
 from lmfit import Parameters, minimize
 from models import gaussFit
 
@@ -9,7 +11,9 @@ names = ("J0004","J0156","J0139","J0232","J2318")
 
 NAME = names[1]
 
-PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/"+NAME+"_DATACUBE_FINAL.FITS"
+PATH = "/home/bjarki/Documents/Thesis/Thesis-1/Data/"+NAME+"/"
+DATA = PATH+NAME+"_DATACUBE_FINAL.fits"
+cube = Cube(filename = DATA)[:,100:220,100:220]
 
 
 if NAME  == "J0004":
@@ -39,9 +43,31 @@ else:
 BIN_NUMBER = 10
 ANN_SIZE = Rmax/BIN_NUMBER
 CENTER = [160,160]
+WL_NUMBER = len(cube[:,1,1].data)
+binned_spectra = np.zeros((WL_NUMBER, BIN_NUMBER))
+im = np.array(cube[2600,:,:].data)
+R = np.arange(0, Rmax+ANN_SIZE, step=ANN_SIZE)
 
-R = np.arange(0.01, Rmax+ANN_SIZE, step=ANN_SIZE)
 
-for r in R:
-    mask = CircularAnnulus(CENTER, r, r+ANN_SIZE).to_mask
-    # Idk man
+for x,wl in enumerate(cube[:,0,0]):
+    ima = cube[x,:,:].data
+    
+    for i, r in enumerate(R):
+        bin_flux = np.array([])
+        # print("Running aperture number",i)
+        if i == 0:
+            aperture = CircularAperture(CENTER, ANN_SIZE).to_mask(method="exact")
+        else:
+            aperture = CircularAnnulus(CENTER, r, r+ANN_SIZE).to_mask(method="exact")
+
+        reg = aperture.cutout(ima)
+        print(reg) # This is always none... why?
+        reg_avg = np.nanmedian(reg)
+        bin_flux = np.append(bin_flux, reg_avg)
+    print(bin_flux)
+    binned_spectra[x] = bin_flux
+    
+
+        
+
+    
