@@ -117,8 +117,8 @@ def fit(cube, linefile, Var, xPix, yPix, zg, wg, MASK):
             
             amp = np.array([])
             amp_err = np.array([])
-            flux = ([])
-            flux_err = ([])
+            flux = np.array([])
+            flux_err = np.array([])
 
             for am in amps:
                 ap = result.params[am]
