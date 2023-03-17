@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -43,7 +44,8 @@ else:
 BIN_NUMBER = 10
 ANN_SIZE = Rmax/BIN_NUMBER
 WL_NUMBER = len(cube[:,1,1].data)
-binned_spectra = np.zeros((WL_NUMBER, BIN_NUMBER+1))
+binned_spectra = np.zeros((WL_NUMBER+1, BIN_NUMBER+1))
+areas = np.array([])
 image = np.array(cube[2600,:,:].data)
 CENTER = np.unravel_index(np.nanargmax(image), image.shape)[::-1] # Opposite indexing
 R = np.arange(0, Rmax+ANN_SIZE, step=ANN_SIZE)
@@ -58,69 +60,53 @@ print(f"Creating mean annular spectra with Rmax {Rmax} over {BIN_NUMBER} bins\n"
 
 
 for wl, dummy in enumerate(cube[:,0,0]):
+    if wl % 100 == 0:
+        print(np.round(wl/len(wls),3)*100,"% done")
     ima = cube[wl,:,:].data
     bin_flux = np.array([])
 
     for r in R:
         if r == 0:
-            aperture = CircularAperture(CENTER, ANN_SIZE).to_mask(method="exact")
-
+            aperture = CircularAperture(CENTER, ANN_SIZE)
+            aperturemask = aperture.to_mask(method="exact")
+            # Saving the area for flux calculation
+            if wl == 0:
+                areas = np.append(areas, aperture.area)
         else:
-            aperture = CircularAnnulus(CENTER, r, r+ANN_SIZE).to_mask(method="exact")
-
+            aperture = CircularAnnulus(CENTER, r, r+ANN_SIZE)
+            aperturemask = aperture.to_mask(method="exact")
+            # Saving the area for flux calculation
+            if wl == 0:
+                areas = np.append(areas, aperture.area)
         # print(aperture)
-        reg = aperture.cutout(ima)
+        reg = aperturemask.cutout(ima)
 
         try:
             reg_avg = np.nanmean(reg)
 
         except ValueError:
-            reg = np.copy(reg)
-            reg_avg = np.nanmean(reg)
-            
-            print(ValueError)
+            reg_avg = np.nan
+
+            # print(ValueError)
 
         bin_flux = np.append(bin_flux, reg_avg)
         
-    binned_spectra[wl] = bin_flux
+    binned_spectra[wl+1] = bin_flux
+
+# For now I just keep the areas at the top of the spectra
+binned_spectra[0] = areas
+cols = ["Bin"+str(i) for i in range(BIN_NUMBER+1)]
+df = pd.DataFrame(binned_spectra, columns=cols)
+wls = np.insert(wls, 0, 0)
+df["wl"] = wls
 
 
+df.to_csv(PATH+"results/annulus/annulus_spectra", index=False)
 
-np.save(PATH+"binnedSpectraTest/Binned", binned_spectra)
 
-# for wl, dummy in enumerate(cube[:,0,0]):
-#     ima = cube[wl,:,:].data
-#     bin_flux = np.array([])
-#     bin_flux2 = np.array([])
+# binned_spectra = np.load(PATH+"binnedSpectraTest/Binned.npy")
 
-#     for r in R:
-#         if r == 0:
-#             aperture = CircularAperture(CENTER, ANN_SIZE).to_mask(method="exact")
 
-#         else:
-#             aperture = CircularAnnulus(CENTER, r, r+ANN_SIZE).to_mask(method="exact")
-
-#         # print(aperture)
-#         reg = aperture.cutout(ima)
-#         reg_avg = np.nanmedian(reg)
-#         try:
-#             reg_avg2 = np.nanmean(reg)
-#         except ValueError:
-#             reg_avg2 = np.nan
-#             print(ValueError)
-#         bin_flux = np.append(bin_flux, reg_avg)
-#         bin_flux2 = np.append(bin_flux2, reg_avg2)
-        
-#     print(bin_flux2)
-#     binned_spectra[wl] = bin_flux
-#     binned_spectra2[wl] = bin_flux2
-
-# print(binned_spectra2)
-
-# np.save(PATH+"binnedSpectraTest/Binned", binned_spectra)
-# np.save(PATH+"binnedSpectraTest/Binned2", binned_spectra2)
-
-binned_spectra = np.load(PATH+"binnedSpectraTest/Binned.npy")
 
 # print(np.shape(binned_spectra))
 
