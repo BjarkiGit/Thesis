@@ -94,7 +94,7 @@ for x in xRange:
 
 
                 print("Fit successfully")
-                # The dataframe doesn't like saving things of different lenghts
+                # The dataframe doesn't like saving things of different lengths
                 # so I set up a column with one value repeated all the way down
                 # to save in the dataframe for z, z_err, FWHM, and FWHM_err
 

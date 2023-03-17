@@ -22,13 +22,15 @@ def bad_fit(size):
 def annulus_fit(wl, flux0, linefile, zg, wg):
 
     area = flux0[0]
-    flux0 = np.delete(flux0, 0)
-    wl = wl[1:]
+    # Removing the area from the fluxes and the extra 0 in the wavelengths
+    np.delete(flux0, 0)
+    np.delete(wl,0)
     df = pd.DataFrame({"flux0":flux0, "wl":wl})
     noisy = False
 
 
     # Take the rolling median of the flux in the data frame and storing
+    df = df.fillna(0)
     wdw = 100 # Window size of rolling median
     flux = df["flux0"]-df["flux0"].rolling(window=wdw, center=True).median()
     df["flux"] = flux
