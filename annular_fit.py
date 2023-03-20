@@ -21,10 +21,6 @@ def bad_fit(size):
 
 def annulus_fit(wl, flux0, linefile, zg, wg):
 
-    area = flux0[0]
-    # Removing the area from the fluxes and the extra 0 in the wavelengths
-    np.delete(flux0, 0)
-    np.delete(wl,0)
     df = pd.DataFrame({"flux0":flux0, "wl":wl})
     noisy = False
 
@@ -117,7 +113,7 @@ def annulus_fit(wl, flux0, linefile, zg, wg):
                     ferr = 1e10
 
                 else:
-                    fl = a*wid.value*4*np.sqrt(np.log(2)*np.pi)/area
+                    fl = a*wid.value*4*np.sqrt(np.log(2)*np.pi)
                     ferr = np.sqrt((a_err/a)**2+(wid_err/wid)**2)*fl
 
                 amp_err = np.append(amp, a_err)
@@ -126,6 +122,7 @@ def annulus_fit(wl, flux0, linefile, zg, wg):
                 flux_err = np.append(flux_err, ferr)
 
         except Exception as e:
+            print(e)
             result, amp, amp_err, flux, flux_err = bad_fit(wl_air)
 
     else:
